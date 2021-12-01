@@ -30,11 +30,6 @@ fn main() {
                 .help("Display top N words")
                 .required(true);
 
-    let line_mode = Arg:with_name("lines")
-                    .lond("lines")
-                    .takes_value(false)
-                    .help("Line mode - count unique lines not whitespace separated words.")
-                    .requied(false);
 
     let app = app.arg(topn);
     let matches = app.get_matches();
