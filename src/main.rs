@@ -36,7 +36,7 @@ fn print_map(map: Arc<Mutex<HashMap<String, usize>>>, size: usize) {
     print!("\x1B[2J\x1B[1;1H");
     for (k, v) in hash_vec {
         {
-            println!("{} {}", k, v);
+            println!("{: <10} {}", k, v);
             count += 1;
             if count >= size {
                 count = 0;
@@ -50,7 +50,6 @@ fn print_map(map: Arc<Mutex<HashMap<String, usize>>>, size: usize) {
 fn print_map_loop(map: Arc<Mutex<HashMap<String, usize>>>, size: usize, refresh: u64) {
     let mut count: usize = 0;
     let mut old_map = HashMap::new();
-    thread::sleep(time::Duration::from_secs(5));
     loop {
         let xmap = map.lock().unwrap();
         let map = xmap.clone();
@@ -62,9 +61,9 @@ fn print_map_loop(map: Arc<Mutex<HashMap<String, usize>>>, size: usize, refresh:
         for (k, v) in hash_vec {
             {
                 if let Some(rate) = calculate_rate(&old_map, k, v, refresh) {
-                    println!("{} {}   [{}/s]", k, v, rate);
+                    println!("{: <10}{: <10} [{}/s]", k, v, rate);
                 } else {
-                    println!("{} {}", k, v);
+                    println!("{: <10}{}", k, v);
                 }
                 count += 1;
                 if count >= size {
@@ -86,8 +85,8 @@ fn main() {
         .about("top like word counting")
         .author("Marek Kroemeke");
 
-    let topn = Arg::with_name("topn")
-        .long("topn")
+    let top = Arg::with_name("top")
+        .long("top")
         .short("t")
         .takes_value(true)
         .default_value("25")
@@ -106,12 +105,12 @@ fn main() {
         .takes_value(false)
         .help("Line mode - count same lines not words.");
 
-    let app = app.args(&[topn, refresh, line]);
+    let app = app.args(&[top, refresh, line]);
     let matches = app.get_matches();
 
-    let i = matches
-        .value_of("topn")
-        .expect("topn can't be none")
+    let t = matches
+        .value_of("top")
+        .expect("top can't be none")
         .parse::<usize>()
         .unwrap();
 
@@ -137,7 +136,7 @@ fn main() {
 
     // Don't spawn a thread that prints top if we passed -r 0
     if r != 0 {
-        thread::spawn(move || print_map_loop(arc_map, i, r));
+        thread::spawn(move || print_map_loop(arc_map, t, r));
     }
 
     let wordmap = wordmap;
@@ -165,7 +164,7 @@ fn main() {
             }
         }
     }
-    print_map(wordmap, i);
+    print_map(wordmap, t);
 }
 
 #[cfg(test)]
