@@ -12,7 +12,12 @@ use std::time;
 /// calculate rate per second.
 // TODO change key/value into a tuple
 // TODO change return to Option
-fn calculate_rate(map: &HashMap<String, usize>, key: &String, value: &usize, seconds: u64) -> Option<usize> {
+fn calculate_rate(
+    map: &HashMap<String, usize>,
+    key: &String,
+    value: &usize,
+    seconds: u64,
+) -> Option<usize> {
     let s = seconds as usize;
     match map.get(key) {
         Some(&p) => {
@@ -23,7 +28,6 @@ fn calculate_rate(map: &HashMap<String, usize>, key: &String, value: &usize, sec
         _ => None,
     }
 }
-
 
 fn print_map(map: Arc<Mutex<HashMap<String, usize>>>, size: usize) {
     let mut count: usize = 0;
@@ -36,7 +40,7 @@ fn print_map(map: Arc<Mutex<HashMap<String, usize>>>, size: usize) {
     print!("\x1B[2J\x1B[1;1H");
     for (k, v) in hash_vec {
         {
-            println!("{: <10} {}", k, v);
+            println!("{: <20} {}", k, v);
             count += 1;
             if count >= size {
                 count = 0;
@@ -46,10 +50,14 @@ fn print_map(map: Arc<Mutex<HashMap<String, usize>>>, size: usize) {
     }
 }
 
-
+// TODO add sorting by rate
+// TODO dynamically adjust format {: <20} if keys are too long
+// TODO maybe add tui-rs option for prettier printing
 fn print_map_loop(map: Arc<Mutex<HashMap<String, usize>>>, size: usize, refresh: u64) {
     let mut count: usize = 0;
     let mut old_map = HashMap::new();
+    let mut kwidth = 10; // key (word/line) width fill
+    let mut twidth = 10; // value count width
     loop {
         let xmap = map.lock().unwrap();
         let map = xmap.clone();
@@ -61,9 +69,22 @@ fn print_map_loop(map: Arc<Mutex<HashMap<String, usize>>>, size: usize, refresh:
         for (k, v) in hash_vec {
             {
                 if let Some(rate) = calculate_rate(&old_map, k, v, refresh) {
-                    println!("{: <10}{: <10} [{}/s]", k, v, rate);
+                    if k.len() > kwidth {
+                        kwidth = k.len();
+                    }
+                    if rate.to_string().len() + 3 > twidth {
+                        twidth = rate.to_string().len() + 4;
+                    }
+                    println!(
+                        "{: <kwidth$} {: <twidth$} {}",
+                        k,
+                        format!("[{}/s]", rate),
+                        v,
+                        kwidth = kwidth,
+                        twidth = twidth,
+                    );
                 } else {
-                    println!("{: <10}{}", k, v);
+                    println!("{: <kwidth$}  {}", k, v, kwidth = kwidth + 10);
                 }
                 count += 1;
                 if count >= size {
@@ -76,7 +97,6 @@ fn print_map_loop(map: Arc<Mutex<HashMap<String, usize>>>, size: usize, refresh:
         thread::sleep(time::Duration::from_secs(refresh));
     }
 }
-
 
 fn main() {
     // argument parsing boilerplate
@@ -169,8 +189,8 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-use std::collections::HashMap;
-use super::*;
+    use super::*;
+    use std::collections::HashMap;
 
     #[test]
     fn test_calculate_rate() {
