@@ -9,6 +9,7 @@ description = "Counts words in stream and update while processing input."
 
 [profile.release]
 debug = true
+lto = true
 
 [dependencies]
 clap = "2.33.3"
