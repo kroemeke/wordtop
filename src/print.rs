@@ -4,6 +4,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time;
 
+#[allow(dead_code)]
 pub fn print_map(map: Arc<Mutex<HashMap<String, usize>>>, size: usize) {
     let mut count: usize = 0;
     let xmap = map.lock().unwrap();
@@ -28,6 +29,7 @@ pub fn print_map(map: Arc<Mutex<HashMap<String, usize>>>, size: usize) {
 /// Given a Vec of tuples (word, count, rate), iterate over the vector and pretty-print the
 /// the result. Result is printed as-is without any changes to to the order. Caller is responsible
 /// for sorting Vec in advance if required.
+#[allow(dead_code)]
 pub fn print_stats(
     hash_vec: &Vec<(String, usize, usize)>,
     kwidth: usize,
