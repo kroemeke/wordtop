@@ -7,8 +7,9 @@ use std::process;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
-mod calculate; // functions related to rate calculation
-mod print; // functions related to presenting results
+mod calculate; // rate calculation
+mod file; // saving results to file
+mod print; // presenting results
 
 fn main() {
     // argument parsing boilerplate
@@ -46,7 +47,14 @@ fn main() {
         .default_value("count")
         .help("Sort by");
 
-    let app = app.args(&[top, refresh, line, sort]);
+    let out = Arg::with_name("out")
+        .long("out")
+        .short("o")
+        .takes_value(true)
+        .required(false)
+        .help("Save total count into a file at the end.");
+
+    let app = app.args(&[top, refresh, line, sort, out]);
     let matches = app.get_matches();
 
     let t = matches
@@ -68,6 +76,8 @@ fn main() {
         .expect("sort can't be none")
         .parse::<String>()
         .unwrap();
+
+    //let filename = matches.value_of("out").parse::<String>().unwrap();
 
     let wordmap = Arc::new(Mutex::new(HashMap::new()));
 
@@ -111,5 +121,16 @@ fn main() {
             }
         }
     }
-    print::print_map(wordmap, t);
+    match matches.value_of("out") {
+        Some(filename) => match file::save_result(wordmap, filename.to_string()) {
+            Ok(()) => {
+                println!("Saved to: {}", filename);
+            }
+            Err(err) => {
+                eprintln!("ERROR while saving to {} : {}", filename, err);
+            }
+        },
+        _ => (),
+    };
+    //print::print_map(wordmap, t);
 }

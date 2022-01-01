@@ -28,7 +28,6 @@ pub fn calculate_rate_top(
     old_map: &HashMap<String, usize>,
     new_map: &HashMap<String, usize>,
     seconds: usize,
-    items: usize,
 ) -> HashMap<String, usize> {
     let mut result = HashMap::new();
     // iterate over new_map
@@ -63,7 +62,7 @@ mod tests {
         let mut new_map = HashMap::new();
         old_map.insert("dupa".to_string(), 10);
         new_map.insert("dupa".to_string(), 110);
-        let result = calculate_rate_top(&old_map, &new_map, 10, 15);
+        let result = calculate_rate_top(&old_map, &new_map, 10);
         for (k, v) in result.iter() {
             println!("result k:{} v:{}", k, v);
         }

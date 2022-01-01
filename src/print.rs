@@ -28,7 +28,11 @@ pub fn print_map(map: Arc<Mutex<HashMap<String, usize>>>, size: usize) {
 /// Given a Vec of tuples (word, count, rate), iterate over the vector and pretty-print the
 /// the result. Result is printed as-is without any changes to to the order. Caller is responsible
 /// for sorting Vec in advance if required.
-pub fn print_stats(hash_vec: &Vec<(String, usize, usize)>, kwidth: usize, twidth: usize) -> (usize, usize) {
+pub fn print_stats(
+    hash_vec: &Vec<(String, usize, usize)>,
+    kwidth: usize,
+    twidth: usize,
+) -> (usize, usize) {
     let mut kwidth = kwidth; // key (word/line) width fill
     let mut twidth = twidth; // value count width
     for (word, count, rate) in hash_vec {
@@ -55,17 +59,16 @@ pub fn print_stats(hash_vec: &Vec<(String, usize, usize)>, kwidth: usize, twidth
 #[cfg(test)]
 mod tests {
     use super::*;
-  #[test]
-  fn test_print_stats() {
-      let mut x: Vec<(String, usize, usize)> = Vec::new(); 
-      x.push(("dupa".to_string(),100,10));
-      x.push(("dupadupadupadupa".to_string(),100,10));
-      x.push(("dupa2".to_string(),100,13213120));
-      let (mut k, mut t) = print_stats(&x, 10,10);
-      let (mut k, mut t) = print_stats(&x, 10,10);
-  }
+    #[test]
+    fn test_print_stats() {
+        let mut x: Vec<(String, usize, usize)> = Vec::new();
+        x.push(("dupa".to_string(), 100, 10));
+        x.push(("dupadupadupadupa".to_string(), 100, 10));
+        x.push(("dupa2".to_string(), 100, 13213120));
+        let (mut k, mut t) = print_stats(&x, 10, 10);
+        let (mut k, mut t) = print_stats(&x, 10, 10);
+    }
 }
-
 
 // TODO add sorting by rate
 // TODO dynamically adjust format {: <20} if keys are too long
@@ -94,8 +97,7 @@ pub fn print_map_loop(
         } else {
             // if we sort by rate, we need to calculate using our calculate_rate_top function
             // which returns a map where value is rate instead of count
-            rate_map =
-                calculate::calculate_rate_top(&old_map, &map, refresh.try_into().unwrap(), 10);
+            rate_map = calculate::calculate_rate_top(&old_map, &map, refresh.try_into().unwrap());
             hash_vec = rate_map.iter().collect();
             hash_vec.sort_by(|a, b| b.1.cmp(a.1));
         }
@@ -129,6 +131,8 @@ pub fn print_map_loop(
                     count = 0;
                     break;
                 };
+            } else {
+                todo!("Implement display sorted by rate.");
             }
         }
         old_map = map.clone();
