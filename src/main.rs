@@ -1,4 +1,3 @@
-#![allow(unused_assignments)]
 use clap::{App, Arg};
 use std::collections::HashMap;
 use std::io;
