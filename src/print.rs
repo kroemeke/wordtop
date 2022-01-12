@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time;
 
-pub fn print_map(map: Arc<Mutex<HashMap<String, u64>>>, size: usize) {
+pub fn print_map(map: &Arc<Mutex<HashMap<String, u64>>>, size: usize) {
     let mut count: usize = 0;
     let xmap = map.lock().unwrap();
     let map = xmap.clone();

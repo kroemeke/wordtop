@@ -120,6 +120,7 @@ fn main() {
             }
         }
     }
+    print::print_map(&wordmap, t);
     match matches.value_of("out") {
         Some(filename) => match file::save_result(wordmap, filename.to_string()) {
             Ok(()) => {
@@ -131,5 +132,4 @@ fn main() {
         },
         _ => (),
     };
-    //print::print_map(wordmap, t);
 }
